@@ -25,5 +25,5 @@ class InstalledApp(models.Model):
     app_y_weight = models.IntegerField(default=1)
     
     def __str__(self):
-        return "App %d At %s"%(self.app_id, self.app_page_id)
+        return "App %d At %s of %s"%(self.app_id, self.app_page_id, self.user.username)
 

@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<title>Dashboard</title>
 {% if app_list %}
 {% load static %}
 <script src="{% static "dashboard/jquery-3.2.0.min.js" %}"></script>
@@ -43,7 +44,7 @@ $(document).ready(function(){
   }
   for(i=0; i<app_id_array.length; i++){
     $.ajax(
-      {url:app_array[i], dataType: "jsonp", jsonp: "callback", data: {dashboard_request: "true", dashboard_link:"127.0.0.1/dash/",sendback:i}, success:function(response){
+      {url:app_array[i], dataType: "jsonp", jsonp: "callback", data: {dashboard_request: "true", dashboard_url: "http://192.168.1.1:8080/", sendback:i}, success:function(response){
       if(response["load_current_page"]=="true"){
         i = parseInt(response["sendback"]);
         $("#app_"+app_id_array[i]).attr("src",app_array[i]+"?"+response["get_parameter"]+"=true");
@@ -56,6 +57,7 @@ $(document).ready(function(){
   }
   
 });
+
 </script>
 <style>
 html, body {
