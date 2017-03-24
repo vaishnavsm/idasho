@@ -63,18 +63,34 @@ def req(request):
             return HttpResponse(dumpJsonp(request,response), content_type='application/javascript')
         else:
             return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'no_request'}), content_type="application/javascript")
-    return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'faulty_request'}), content_type="application/json")
+    return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'faulty_request'}), content_type="application/javascript")
 
 def install_app(request):
-    if('page_url' in request.GET and 'tile_url' in request.GET):
+    if('remove' in request.GET and  request.GET['remove']=='true'):
         user = None
         try:
             user = User.objects.get(username=request.session['username'])
         except:
-            return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'invalid_user'}), content_type="application/json")
+            return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'invalid_user'}), content_type="application/javascript")
+        if('page_url' in request.GET):
+            app = InstalledApp.objects.get(app_page_id = request.GET['page_url'], user=user)
+            app.delete()
+            return HttpResponse(dumpJsonp(request,{'error':'false'}), content_type="application/javascript")
+        elif('tile_url' in request.GET):
+            app = InstalledApp.objects.get(app_tile_id = request.GET['tile_url'], user=user)
+            app.delete()
+            return HttpResponse(dumpJsonp(request,{'error':'false'}), content_type="application/javascript")
+        else:
+            return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'no_remove_parameter'}), content_type="application/javascript")
+    elif('page_url' in request.GET and 'tile_url' in request.GET):
+        user = None
+        try:
+            user = User.objects.get(username=request.session['username'])
+        except:
+            return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'invalid_user'}), content_type="application/javascript")
         newApp = InstalledApp(app_page_id=request.GET['page_url'], app_tile_id=request.GET['page_url'], user=user, app_id = user.maxapp+1)
         newApp.save()
         user.maxapp = user.maxapp + 1
         user.save()
-        return HttpResponse(dumpJsonp(request,{'error':'false'}), content_type="application/json")
-    return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'faulty_request'}), content_type="application/json")
+        return HttpResponse(dumpJsonp(request,{'error':'false'}), content_type="application/javascript")
+    return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'faulty_request'}), content_type="application/javascript")
