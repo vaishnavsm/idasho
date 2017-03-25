@@ -9,34 +9,7 @@
 
 var DASHBOARD_URL_LOC = "http://127.0.0.1:8000";
 
-function all_tiles(){
-  var app_page_array = [{% for app in app_list %}"{{ app.app_tile_id }}", {% endfor %}];
-  var app_id_array = [{% for app in app_list %}"{{ app.app_id }}", {% endfor %}];
-  for(j=0; j<app_id_array.length; j++){
-    $("#app_"+app_id_array[j]).attr("class","appbox");
-  }
-  $(window).off("click");
-}
-
-function fsoc(event){
-  event.stopPropagation();
-  var app_page_array = [{% for app in app_list %}"{{ app.app_page_id }}", {% endfor %}];
-  var app_id_array = [{% for app in app_list %}"{{ app.app_id }}", {% endfor %}];
-  var i = parseInt(this.id.substring(4));
-  for(j=0; j<app_id_array.length; j++){
-    if(i==app_id_array[j]) {
-      $("#app_"+app_id_array[j]).attr("class","fullscreen");
-      $("#app_"+app_id_array[j]).attr("src", app_page_array[j]);
-      $(window).click(all_tiles);
-      $("#app_"+app_id_array[j]).click(function(event){
-        event.stopPropagation();
-      });
-    }
-    else $("#app_"+app_id_array[j]).attr("class","hidden");
-  }
-}
-
-$(document).ready(function(){
+function loadTiles(){
   var app_array = [{% for app in app_list %}"{{ app.app_tile_id }}", {% endfor %}];
   var app_page_array = [{% for app in app_list %}"{{ app.app_page_id }}", {% endfor %}];
   var app_id_array = [{% for app in app_list %}"{{ app.app_id }}", {% endfor %}];
@@ -46,6 +19,7 @@ $(document).ready(function(){
       $("iframe#app_"+app_id_array[i]).click(fsoc);
   }
   for(i=0; i<app_id_array.length; i++){
+    $("div#app_"+app_id_array[i]).attr("class","visible");
     $.ajax(
       {url:app_array[i], dataType: "jsonp", jsonp: "callback", data: {dashboard_request: "true", dashboard_url: DASHBOARD_URL_LOC, sendback:i}, success:function(response){
       var i = parseInt(response["sendback"]);
@@ -71,7 +45,33 @@ $(document).ready(function(){
   
   });
   }
-  
+}
+
+function all_tiles(){
+  $(window).off("click");
+  loadTiles();
+}
+
+function fsoc(event){
+  event.stopPropagation();
+  var app_page_array = [{% for app in app_list %}"{{ app.app_page_id }}", {% endfor %}];
+  var app_id_array = [{% for app in app_list %}"{{ app.app_id }}", {% endfor %}];
+  var i = parseInt(this.id.substring(4));
+  for(j=0; j<app_id_array.length; j++){
+    if(i==app_id_array[j]) {
+      $("iframe#app_"+app_id_array[j]).attr("class","fullscreen");
+      $("iframe#app_"+app_id_array[j]).attr("src", app_page_array[j]);
+      $(window).click(all_tiles);
+      $("iframe#app_"+app_id_array[j]).click(function(event){
+        event.stopPropagation();
+      });
+    }
+    else $("div#app_"+app_id_array[j]).attr("class","hidden");
+  }
+}
+
+$(document).ready(function(){
+  loadTiles();  
 });
 
 </script>
@@ -93,7 +93,10 @@ html, body {
 .invisiblelist {
   list-style-type: none;
 }
-
+.visible{
+  display: block;
+  visibility: visible;
+}
 .hidden{
   display: none;
   visibility: hidden;  
@@ -122,7 +125,7 @@ html, body {
       <li>
         <div id="app_{{app.app_id}}">
         <iframe class="hidden" id="app_{{app.app_id}}" src="{{app.app_page_id}}" ></iframe>
-        <img class="appbox" id="app_{{app.app_id}}"></img>
+        <img class="appbox" id="app_{{app.app_id}}" src="{{app.app_tile_id}}"></img>
         </div>
       </li>
     {% endfor %}

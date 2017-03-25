@@ -88,7 +88,7 @@ def install_app(request):
             user = User.objects.get(username=request.session['username'])
         except:
             return HttpResponse(dumpJsonp(request,{'error':'true', 'error_message':'invalid_user'}), content_type="application/javascript")
-        newApp = InstalledApp(app_page_id=request.GET['page_url'], app_tile_id=request.GET['page_url'], user=user, app_id = user.maxapp+1)
+        newApp = InstalledApp(app_page_id=request.GET['page_url'], app_tile_id=request.GET['tile_url'], user=user, app_id = user.maxapp+1)
         newApp.save()
         user.maxapp = user.maxapp + 1
         user.save()
