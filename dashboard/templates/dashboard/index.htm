@@ -107,6 +107,7 @@ html, body {
   max-height: 250px;
   display: block;
   visibility: visible;
+  color: lime;
 }
 .hidden{
   display: none;
@@ -120,6 +121,11 @@ html, body {
   width: 95%;
   height: 90%;
 }
+
+.tiledcontainer li{
+  display: inline;
+  float: left;
+}
 </style>
 {% endif %}
 </head>
@@ -130,7 +136,7 @@ html, body {
 
 
 {% if app_list %}
-  <ul class="invisiblelist">
+  <ul class="invisiblelist tiledcontainer">
     <!--    src="{{app.app_page_id}}"     -->
     {% for app in app_list %}
       <li>
