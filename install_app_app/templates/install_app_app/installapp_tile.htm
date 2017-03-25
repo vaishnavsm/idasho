@@ -19,7 +19,7 @@
       }
       else{
         $("#errormsg").text("");
-        $.ajax({url:"http://192.168.1.1:8000/install/", dataType: "jsonp", jsonp: "callback", data: {page_url:pageurl, tile_url: tileurl}, success:function(response){
+        $.ajax({url:"{{dashboard_url}}/install/", dataType: "jsonp", jsonp: "callback", data: {page_url:pageurl, tile_url: tileurl}, success:function(response){
           $("#errormsg").text("Installed Successfully");
       }
     
@@ -35,13 +35,13 @@
          //alert(tileurl);
          if(tileurl != ""){
            $("#errormsg").text("");
-           $.ajax({url:"http://192.168.1.1:8000/install/", dataType: "jsonp", jsonp: "callback", data: {tile_url: tileurl, remove: "true"}, success:function(response){
+           $.ajax({url:"{{dashboard_url}}/install/", dataType: "jsonp", jsonp: "callback", data: {tile_url: tileurl, remove: "true"}, success:function(response){
              $("#errormsg").text("Removed Successfully");
            }});
          }
          else if(pageurl != ""){
            $("#errormsg").text("");
-           $.ajax({url:"http://192.168.1.1:8000/install/", dataType: "jsonp", jsonp: "callback", data: {page_url:pageurl, remove: "true"}, success:function(response){
+           $.ajax({url:"{{dashboard_url}}/install/", dataType: "jsonp", jsonp: "callback", data: {page_url:pageurl, remove: "true"}, success:function(response){
              $("#errormsg").text("Removed Successfully");
          }});
          }

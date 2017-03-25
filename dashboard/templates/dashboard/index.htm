@@ -7,13 +7,51 @@
 <script src="{% static "dashboard/jquery-3.2.0.min.js" %}"></script>
 <script>
 
-function all_tiles(){
-  var app_page_array = [{% for app in app_list %}"{{ app.app_tile_id }}", {% endfor %}];
+var DASHBOARD_URL_LOC = "http://127.0.0.1:8000";
+
+function loadTiles(){
+  var app_array = [{% for app in app_list %}"{{ app.app_tile_id }}", {% endfor %}];
+  var app_page_array = [{% for app in app_list %}"{{ app.app_page_id }}", {% endfor %}];
   var app_id_array = [{% for app in app_list %}"{{ app.app_id }}", {% endfor %}];
-  for(j=0; j<app_id_array.length; j++){
-    $("#app_"+app_id_array[j]).attr("class","appbox");
+  var i=0;
+  for(i=0; i<app_id_array.length; i++){
+      $("img#app_"+app_id_array[i]).click(fsoc);
+      $("iframe#app_"+app_id_array[i]).click(fsoc);
+      $("img#app_"+app_id_array[i]).attr("class","appbox")
+      $("iframe#app_"+app_id_array[i]).attr("class","hidden");
   }
+  for(i=0; i<app_id_array.length; i++){
+    $("div#app_"+app_id_array[i]).attr("class","visible");
+    $.ajax(
+      {url:app_array[i], dataType: "jsonp", jsonp: "callback", data: {dashboard_request: "true", dashboard_url: DASHBOARD_URL_LOC, sendback:i}, success:function(response){
+      var i = parseInt(response["sendback"]);
+      if(response["is_interactive_tile"]=="true"){
+        $("iframe#app_"+app_id_array[i]).attr("class","appbox");
+        $("img#app_"+app_id_array[i]).attr("class","hidden");
+        if(response["load_current_page"]=="false"){
+          $("iframe#app_"+app_id_array[i]).attr("src",response["page_to_load"]+"?"+response["get_parameter"]+"=true");
+        }
+        else{
+          $("iframe#app_"+app_id_array[i]).attr("src",app_array[i]+"?"+response["get_parameter"]+"=true");
+        }
+        if(response["fullscreen_on_click"]=="false")
+          $("iframe#app_"+app_id_array[i]).off("click");
+        }
+      else{
+        $("iframe#app_"+app_id_array[i]).attr("class","hidden");
+        $("iframe#app_"+app_id_array[i]).attr("src","");
+        $("img#app_"+app_id_array[i]).attr("class","appbox");
+        $("img#app_"+app_id_array[i]).attr("src",app_array[i]);
+      }
+    }
+  
+  });
+  }
+}
+
+function all_tiles(){
   $(window).off("click");
+  loadTiles();
 }
 
 function fsoc(event){
@@ -23,39 +61,20 @@ function fsoc(event){
   var i = parseInt(this.id.substring(4));
   for(j=0; j<app_id_array.length; j++){
     if(i==app_id_array[j]) {
-      $("#app_"+app_id_array[j]).attr("class","fullscreen");
-      $("#app_"+app_id_array[j]).attr("src", app_page_array[j]);
+      $("img#app_"+app_id_array[j]).attr("class","hidden");
+      $("iframe#app_"+app_id_array[j]).attr("class","fullscreen");
+      $("iframe#app_"+app_id_array[j]).attr("src", app_page_array[j]);
       $(window).click(all_tiles);
-      $("#app_"+app_id_array[j]).click(function(event){
+      $("iframe#app_"+app_id_array[j]).click(function(event){
         event.stopPropagation();
       });
     }
-    else $("#app_"+app_id_array[j]).attr("class","hidden");
+    else $("div#app_"+app_id_array[j]).attr("class","hidden");
   }
 }
 
 $(document).ready(function(){
-  var app_array = [{% for app in app_list %}"{{ app.app_tile_id }}", {% endfor %}];
-  var app_page_array = [{% for app in app_list %}"{{ app.app_page_id }}", {% endfor %}];
-  var app_id_array = [{% for app in app_list %}"{{ app.app_id }}", {% endfor %}];
-  var i=0;
-  for(i=0; i<app_id_array.length; i++){
-      $("#app_"+app_id_array[i]).click(fsoc);
-  }
-  for(i=0; i<app_id_array.length; i++){
-    $.ajax(
-      {url:app_array[i], dataType: "jsonp", jsonp: "callback", data: {dashboard_request: "true", dashboard_url: "http://192.168.1.1:8080/", sendback:i}, success:function(response){
-      if(response["load_current_page"]=="true"){
-        i = parseInt(response["sendback"]);
-        $("#app_"+app_id_array[i]).attr("src",app_array[i]+"?"+response["get_parameter"]+"=true");
-        if(response["fullscreen_on_click"]=="false")
-          $("#app_"+app_id_array[i]).off("click")
-      }
-    }
-  
-  });
-  }
-  
+  loadTiles();  
 });
 
 </script>
@@ -67,12 +86,28 @@ html, body {
 .appbox {
   display: block;
   visibility: visible;  
-  border: 2px solid black;
+  border: 4px solid black;
+  width: auto;
+  min-height: 50px;  
+  height: 250px;
+  max-height: 250px;
+  margin: auto;
+  
 }
 .invisiblelist {
   list-style-type: none;
 }
-
+.visible{
+  margin: 10px;
+  min-width: 250px;
+  max-width: 250px;
+  width: 250px;
+  min-height: 50px;  
+  height: 250px;
+  max-height: 250px;
+  display: block;
+  visibility: visible;
+}
 .hidden{
   display: none;
   visibility: hidden;  
@@ -98,7 +133,12 @@ html, body {
   <ul class="invisiblelist">
     <!--    src="{{app.app_page_id}}"     -->
     {% for app in app_list %}
-      <li><iframe class="appbox" id="app_{{app.app_id}}" src="{{app.app_page_id}}" >App {{app.app_page_id}} Refuses to load</iframe></li>
+      <li>
+        <div id="app_{{app.app_id}}">
+        <iframe class="hidden" id="app_{{app.app_id}}" src="{{app.app_page_id}}" ></iframe>
+        <img class="appbox" id="app_{{app.app_id}}" src="{{app.app_tile_id}}"></img>
+        </div>
+      </li>
     {% endfor %}
   </ul>
 {% else %}
