@@ -7,7 +7,7 @@
 <script src="{% static "dashboard/jquery-3.2.0.min.js" %}"></script>
 <script>
 
-var DASHBOARD_URL_LOC = "http://127.0.0.1:8000";
+var DASHBOARD_URL_LOC = "http://192.168.101.1:8000";
 
 function loadTiles(){
   var app_array = [{% for app in app_list %}"{{ app.app_tile_id }}", {% endfor %}];
@@ -88,6 +88,7 @@ html, body {
   visibility: visible;  
   border: 4px solid black;
   width: auto;
+  max-width: 250px;
   min-height: 50px;  
   height: 250px;
   max-height: 250px;
@@ -101,13 +102,12 @@ html, body {
   margin: 10px;
   min-width: 250px;
   max-width: 250px;
-  width: 250px;
-  min-height: 50px;  
+  width: auto;
+  min-height: 250px;  
   height: 250px;
   max-height: 250px;
   display: block;
   visibility: visible;
-  color: lime;
 }
 .hidden{
   display: none;
