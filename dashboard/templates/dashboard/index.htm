@@ -40,18 +40,21 @@ $(document).ready(function(){
   var app_id_array = [{% for app in app_list %}"{{ app.app_id }}", {% endfor %}];
   var i=0;
   for(i=0; i<app_id_array.length; i++){
-      $("#app_"+app_id_array[i]).click(fsoc);
+      $("img#app_"+app_id_array[i]).click(fsoc);
+      $("iframe#app_"+app_id_array[i]).click(fsoc);
   }
   for(i=0; i<app_id_array.length; i++){
     $.ajax(
       {url:app_array[i], dataType: "jsonp", jsonp: "callback", data: {dashboard_request: "true", dashboard_url: "http://192.168.1.1:8080", sendback:i}, success:function(response){
       var i = parseInt(response["sendback"]);
       if(response["is_interactive_tile"]=="true"){
-        if(response["load_current_page"]=="true"){
-          $("iframe#app_"+app_id_array[i]).attr("src",app_array[i]+"?"+response["get_parameter"]+"=true");
+        $("iframe#app_"+app_id_array[i]).attr("class","appbox");
+        $("img#app_"+app_id_array[i]).attr("class","hidden");
+        if(response["load_current_page"]=="false"){
+          $("iframe#app_"+app_id_array[i]).attr("src",response["page_to_load"]+"?"+response["get_parameter"]+"=true");
         }
         else{
-          $("iframe#app_"+app_id_array[i]).attr("src",response["page_to_load"]+"?"+response["get_parameter"]+"=true");
+          $("iframe#app_"+app_id_array[i]).attr("src",app_array[i]+"?"+response["get_parameter"]+"=true");
         }
         if(response["fullscreen_on_click"]=="false")
           $("iframe#app_"+app_id_array[i]).off("click");
@@ -60,6 +63,7 @@ $(document).ready(function(){
         $("iframe#app_"+app_id_array[i]).attr("class","hidden");
         $("iframe#app_"+app_id_array[i]).attr("src","");
         $("img#app_"+app_id_array[i]).attr("class","appbox");
+        $("img#app_"+app_id_array[i]).attr("src",app_array[i]);
       }
     }
   
