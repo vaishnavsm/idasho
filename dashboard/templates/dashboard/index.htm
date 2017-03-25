@@ -83,6 +83,8 @@ html, body {
   visibility: visible;  
   border: 4px solid black;
   width: 40%;
+  min-width: 50px;
+  min-height: 50px;  
   height: 40%;
   margin: 10px;
 }
@@ -117,8 +119,8 @@ html, body {
     {% for app in app_list %}
       <li>
         <div id="app_{{app.app_id}}">
-        <iframe class="appbox" id="app_{{app.app_id}}" src="{{app.app_page_id}}" ></iframe>
-        <img class="hidden" id="app_{{app.app_id}}"></img>
+        <iframe class="hidden" id="app_{{app.app_id}}" src="{{app.app_page_id}}" ></iframe>
+        <img class="appbox" id="app_{{app.app_id}}"></img>
         </div>
       </li>
     {% endfor %}
