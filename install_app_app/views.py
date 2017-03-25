@@ -14,8 +14,8 @@ def page(request):
         request.session['dashboard_url'] = request.GET['dashboard_url']
         return HttpResponse(dumpJsonp(request, {'load_current_page':'true', 'fullscreen_on_click':'false', 'is_interactive_tile':'true', 'get_parameter':'isdash'}), content_type="application/javascript")
     if('isdash' in request.GET):
-        #context = {'dashboard_url':request.session['dashboard_url']}
-        context = {}
+        context = {'dashboard_url':request.session['dashboard_url']}
+        #context = {}
         return render(request=request, template_name="install_app_app/installapp_tile.htm", context=context)
     return HttpResponse("Boo hoo")
     
